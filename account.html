@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Account - Happy Home</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body><header>
+  <!-- Hamburger for mobile -->
+  <div class="hamburger-menu" onclick="toggleMenu()">&#9776;</div>
+
+  <!-- Mobile Menu -->
+  <nav id="mobileMenu" class="mobile-nav hidden">
+    <a href="index.html">Home</a>
+    <a href="plans.html">Investment Plans</a>
+    <a href="account.html" class="active">My Account</a>
+    <a href="login.html">Login / Register</a>
+  </nav>
+
+  <!-- Desktop Nav -->
+  <div class="nav-container">
+    <div class="logo">C & H</div>
+    <nav class="desktop-nav">
+      <a href="index.html">Home</a>
+      <a href="plans.html">Investment Plans</a>
+      <a href="account.html" class="active">My Account</a>
+      <a href="login.html">Login / Register</a>
+    </nav>
+  </div>
+</header>
+
+  <main>
+    <h2>My Account</h2>
+    <p>Welcome back! View your investment details below.</p>
+
+    <section>
+      <h3>Active Investments</h3>
+      <p>Login to view account information</p>
+      <!-- Replace this area with real user data later -->
+    </section>
+
+    <section>
+      <h3>Withdrawal Info</h3>
+      <p>Minimum withdrawal: ₦5,000 (available monthly)</p>
+      <p> Maximum withdrawal: ₦5,000,000</p>
+    </section>
+  </main>
+
+  <footer>
+    <p style="font-size: 20px; font-weight: bold; text-align: center;">Contact: williamschinedu169@gmail.com | 09077735074</p>
+  </footer>
+  <script>
+  function toggleMenu() {
+    const menu = document.getElementById('mobileMenu');
+    menu.classList.toggle('show');
+  }
+</script>
+</body>
+</html>

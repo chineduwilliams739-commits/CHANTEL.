@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Happy Home Investments</title>
+
+  <style>
+    /* BASE STYLES */
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f9fbfd;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    .container {
+      flex: 1;
+      width: 100%;
+      padding: 0 16px;
+      max-width: 980px;
+      margin: auto;
+    }
+
+    /* HEADER */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 0;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 24px;
+      color: #0077cc;
+      font-weight: bold;
+    }
+    button#logoutBtn {
+      background: #ff5f5f;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    button#logoutBtn:hover {
+      opacity: 0.8;
+    }
+
+    /* BALANCE */
+    .balance-box {
+      background: #0077cc;
+      color: white;
+      border-radius: 12px;
+      padding: 18px 22px;
+      margin: 10px 0 20px;
+      font-size: 22px;
+      font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* ACTION BUTTONS */
+    .actions {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 25px;
+    }
+    .actions button {
+      flex: 1;
+      padding: 14px 0;
+      font-size: 18px;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .deposit-btn {
+      background: #28a745;
+      color: white;
+    }
+    .withdraw-btn {
+      background: #ffc107;
+      color: #333;
+    }
+
+    /* INVESTMENTS LIST */
+    #userInvestments {
+      background: white;
+      padding: 16px;
+      border-radius: 10px;
+      border: 1px solid #dee2e6;
+      margin-bottom: 28px;
+      min-height: 90px;
+    }
+    #userInvestments p {
+      margin: 8px 0;
+      font-size: 15px;
+      color: #555;
+    }
+
+    /* CARDS */
+    .plans-title {
+      font-size: 20px;
+      font-weight: bold;
+      color: #0077cc;
+      margin-bottom: 12px;
+    }
+    .card-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 12px;
+      margin-bottom: 70px; /* space for bottom nav */
+    }
+    .card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      text-align: center;
+      padding: 14px 8px;
+      font-weight: 600;
+    }
+    .card img {
+      width: 70px;
+      height: 70px;
+      object-fit: contain;
+      margin-bottom: 8px;
+    }
+    .card h3 {
+      margin: 6px 0;
+      color: #005fa3;
+    }
+    .card p {
+      font-size: 14px;
+      margin: 4px 0;
+    }
+    .card button {
+      width: 100%;
+      background: #0077cc;
+      color: white;
+      border: none;
+      padding: 8px;
+      border-radius: 6px;
+      margin-top: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .card button:hover {
+      opacity: 0.8;
+    }
+
+    /* BOTTOM NAV */
+    .bottom-nav {
+      position: sticky;
+      bottom: 0;
+      left: 0;
+      display: flex;
+      justify-content: space-around;
+      background: white;
+      border-top: 1px solid #ddd;
+      padding: 8px 0;
+    }
+    .bottom-nav a {
+      text-decoration: none;
+      color: #777;
+      font-size: 14px;
+      text-align: center;
+      font-weight: bold;
+      flex: 1;
+    }
+    .bottom-nav a.active,
+    .bottom-nav a:hover {
+      color: #0077cc;
+    }
+    .bottom-nav img {
+      width: 22px;
+      height: 22px;
+      margin-bottom: 4px;
+    }
+  </style>
+
+</head>
+<body>
+
+<div class="container">
+
+  <!-- HEADER -->
+  <header>
+    <h1>Happy Home</h1>
+    <button id="logoutBtn">Logout</button>
+  </header>
+
+  <!-- BALANCE -->
+  <div class="balance-box">
+    <div>Your Balance</div>
+    <div id="userBalance">₦0</div>
+  </div>
+
+  <!-- DEPOSIT & WITHDRAW -->
+  <div class="actions">
+<button class="deposit-btn" onclick="window.location.href='deposit.html'">Deposit</button>
+<button class="withdraw-btn" onclick="window.location.href='withdraw.html'">Withdraw</button>
+  </div>
+
+  <!-- USER INVESTMENTS -->
+  <div id="userInvestments">
+    <p>Loading investments...</p>
+  </div>
+
+  <!-- AVAILABLE PLANS -->
+  <div class="plans-title">Investment Plans</div>
+  <div class="card-container">
+    <div class="card">
+      <img src="cup.jpg" alt="Cup">
+      <h3>Cup</h3>
+      <p>₦2,000 | Daily: ₦400</p>
+      <button onclick="selectProduct('Cup', 2000)">Invest Now</button>
+    </div>
+    <div class="card">
+      <img src="jug.jpg" alt="Jug">
+      <h3>Jug</h3>
+      <p>₦4,000 | Daily: ₦800</p>
+      <button onclick="selectProduct('Jug', 4000)">Invest Now</button>
+    </div>
+    <div class="card">
+      <img src="chair.jpg" alt="Chair">
+      <h3>Chair</h3>
+      <p>₦6,000 | Daily: ₦1,200</p>
+      <button onclick="selectProduct('Chair', 6000)">Invest Now</button>
+    </div>
+    <div class="card">
+      <img src="table.jpg" alt="Table">
+      <h3>Table</h3>
+      <p>₦8,000 | Daily: ₦1,600</p>
+      <button onclick="selectProduct('Table', 8000)">Invest Now</button>
+    </div>
+    <div class="card">
+      <img src="cupboard.jpg" alt="Cupboard">
+      <h3>Cupboard</h3>
+      <p>₦10,000 | Daily: ₦2,000</p>
+      <button onclick="selectProduct('Cupboard', 10000)">Invest Now</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <a href="dashboard.html" class="active">
+    <img src="dashboard.jpg" alt="Dashboard">Dashboard
+  </a>
+  <a href="investments.html">
+    <img src="invest.jpg" alt="Invest">Invest
+  </a>
+  <a href="refer.html">
+    <img src="refer.jpg" alt="Refer">Refer
+  </a>
+  <a href="me.html">
+    <img src="me.jpg" alt="Me">Me
+  </a>
+</div>
+
+<!-- FIREBASE SCRIPTS -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyBDXn58AfcKIBFsinI11WgOAPJOMVCC1wI",
+    authDomain: "chantel-fdc1e.firebaseapp.com",
+    projectId: "chantel-fdc1e",
+    storageBucket: "chantel-fdc1e.appspot.com",
+    messagingSenderId: "1062906679466",
+    appId: "1:1062906679466:web:8deec4d91f14199d9440d3",
+    measurementId: "G-0M2D80ERS5"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  let balance = 0;
+
+  auth.onAuthStateChanged(user => {
+    if (!user) {
+      window.location.href = "login.html";
+      return;
+    }
+
+    db.collection("investments")
+      .where("userEmail", "==", user.email)
+      .orderBy("requestedAt", "desc")
+      .get()
+      .then(snapshot => {
+        const container = document.getElementById("userInvestments");
+        container.innerHTML = "";
+        if (snapshot.empty) {
+          container.innerHTML = "<p>No investments yet.</p>";
+        } else {
+          snapshot.forEach(doc => {
+            const data = doc.data();
+            balance += data.amount;
+            const div = document.createElement("div");
+            div.innerHTML = `
+              <p><strong>data.plan</strong> – ₦{data.amount.toLocaleString()} (${data.status})</p>
+            `;
+            container.appendChild(div);
+          });
+        }
+        document.getElementById("userBalance").innerText = "₦" + balance.toLocaleString();
+      });
+  });
+
+  function selectProduct(plan, amount) {
+    const user = auth.currentUser;
+    if (!user) {
+      alert("Log in first!");
+      return;
+    }
+    db.collection("investments").add({
+      userEmail: user.email,
+      plan,
+      amount,
+      status: "pending",
+      requestedAt: new Date()
+    }).then(() => location.reload());
+  }
+
+  function depositFunds() {
+    alert("Deposit page not set yet.");
+  }
+
+  function withdrawFunds() {
+    alert("Withdraw page not set yet.");
+  }
+
+  function logout() {
+    auth.signOut().then(() => {
+      location.href = "login.html";
+    });
+  }
+</script>
+
+</body>
+</html>

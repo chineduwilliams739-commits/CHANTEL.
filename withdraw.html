@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Withdraw Funds</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600&display=swap" rel="stylesheet"/>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f9f9f9;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 400px;
+      margin: 40px auto;
+      background: #fff;
+      border-radius: 12px;
+      padding: 30px 25px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    .note {
+      text-align: center;
+      font-style: italic;
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 20px;
+    }
+    input {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #0052cc;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .error {
+      color: red;
+      text-align: center;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Withdraw Funds</h2>
+    <p class="note">"Withdrawal takes less than 24hrs to arrive."</p>
+
+    <input type="number" id="amount" placeholder="Enter amount (₦)" />
+    <input type="text" id="accountName" placeholder="Account Name" />
+    <input type="text" id="accountNumber" placeholder="Account Number" />
+    <input type="text" id="bankName" placeholder="Bank Name" />
+
+    <button onclick="submitWithdrawal()">Request Withdrawal</button>
+    <div id="errorMsg" class="error"></div>
+  </div>
+
+  <script>
+    function submitWithdrawal() {
+      const amount = parseFloat(document.getElementById("amount").value);
+      const accountName = document.getElementById("accountName").value.trim();
+      const accountNumber = document.getElementById("accountNumber").value.trim();
+      const bankName = document.getElementById("bankName").value.trim();
+      const balance = parseFloat(localStorage.getItem("userBalance") || "0");
+
+      if (!amount || amount < 5000 || !accountName || !accountNumber || !bankName) {
+        document.getElementById("errorMsg").innerText = "Please fill in all fields correctly (min ₦5000)";
+        return;
+      }
+
+      if (amount > balance) {
+        document.getElementById("errorMsg").innerText = "Insufficient funds.";
+        return;
+      }
+
+      const newBalance = balance - amount;
+      localStorage.setItem("userBalance", newBalance);
+
+      const withdrawals = JSON.parse(localStorage.getItem("withdrawals") || "[]");
+      withdrawals.push({
+        amount,
+        accountName,
+        accountNumber,
+        bankName,
+        status: "Pending",
+        date: new Date().toLocaleString()
+      });
+      localStorage.setItem("withdrawals", JSON.stringify(withdrawals));
+
+      window.location.href = "withdrawal_history.html";
+    }
+  </script>
+</body>
+</html>

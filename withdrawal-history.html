@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Withdrawal History</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+      padding: 20px;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+    }
+    .card {
+      background: white;
+      margin-bottom: 15px;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .card p {
+      margin: 5px 0;
+    }
+    .status {
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Withdrawal History</h2>
+    <div id="history"></div>
+  </div>
+
+  <script>
+    const withdrawals = JSON.parse(localStorage.getItem("withdrawals") || "[]");
+
+    const container = document.getElementById("history");
+    if (withdrawals.length === 0) {
+      container.innerHTML = "<p>No withdrawals yet.</p>";
+    } else {
+      withdrawals.forEach(w => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <p><strong>Amount:</strong> ₦parseFloat(w.amount).toLocaleString()</p>
+          <p><strong>Date:</strong>{w.date}</p>
+          <p class="status"><strong>Status:</strong> ${w.status}</p>
+        `;
+        container.appendChild(card);
+      });
+    }
+  </script>
+</body>
+</html>

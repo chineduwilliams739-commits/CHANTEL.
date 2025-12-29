@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Payment Instructions</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+      padding: 20px;
+    }
+    .card {
+      background: white;
+      max-width: 400px;
+      margin: auto;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .amount-box {
+      background: #e0f0ff;
+      font-size: 24px;
+      font-weight: bold;
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 5px;
+    }
+    button {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 5px;
+      font-weight: bold;
+      width: 100%;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    p {
+      font-size: 14px;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2 style="color:#007bff">Make Your Payment</h2>
+    <p><strong>Account Number:</strong> 8129002773</p>
+    <p><strong>Bank:</strong> Palmpay</p>
+    <p><strong>Account Name:</strong> Helen Ginika Umunnakwe</p>
+    <div class="amount-box" id="displayAmount">₦0</div>
+
+    <p>Please make the exact payment to the account above. The admin will confirm your deposit and your wallet will be funded accordingly.</p>
+
+    <button onclick="redirectToUpload()">I've Already Paid</button>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const amount = parseFloat(params.get("amount")) || 0;
+    document.getElementById("displayAmount").innerText = "₦" + amount.toLocaleString();
+
+    function redirectToUpload() {
+      if(amount <= 0) {
+        alert("Invalid payment amount.");
+        return;
+      }
+      window.location.href = "upload_receipt.html";
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Register</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0; padding: 0;
+      background: #f1f4f8;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 20px;
+      background-color: #007bff;
+      color: white;
+    }
+
+    .logo {
+      font-weight: bold;
+      font-size: 20px;
+    }
+
+    .menu-icon {
+      font-size: 28px;
+      cursor: pointer;
+      user-select: none;
+      display: block;
+    }
+
+    nav {
+      display: none;
+    }
+
+    nav.show {
+      display: block;
+      background: white;
+      padding: 10px 20px;
+    }
+
+    nav a {
+      display: block;
+      padding: 10px 0;
+      color: #007bff;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .container {
+      max-width: 380px;
+      margin: 50px auto;
+      background: white;
+      padding: 30px 25px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    }
+
+    h2 {
+      text-align: center;
+      color: #007bff;
+      margin-bottom: 25px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="password"] {
+      width: 100%;
+      padding: 12px 14px;
+      margin-bottom: 18px;
+      border: 1.8px solid #ccc;
+      border-radius: 4px;
+      font-size: 15px;
+      box-sizing: border-box;
+    }
+
+    input:focus {
+      border-color: #007bff;
+      outline: none;
+    }
+
+    button {
+      width: 100%;
+      background-color: #007bff;
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 4px;
+      font-size: 17px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .login-link {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 14px;
+    }
+
+    .login-link a {
+      color: #007bff;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    @media (min-width: 600px) {
+      nav {
+        display: block !important;
+      }
+      .menu-icon {
+        display: none;
+      }
+
+      nav a {
+        display: inline-block;
+        margin-left: 20px;
+        padding: 0;
+      }
+
+      nav.show {
+        display: block;
+        background: transparent;
+        padding: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">C & H</div>
+  <div class="menu-icon" id="menuToggle">&#9776;</div>
+  <nav id="mobileMenu">
+    <a href="index.html">Home</a>
+    <a href="login.html">Login</a>
+    <a href="plans.html">Plans</a>
+    <a href="account.html">Account</a>
+  </nav>
+</header>
+
+<div class="container">
+  <h2>Register</h2>
+  <form id="registerForm">
+    <input type="text" id="fullName" placeholder="Full Name" required />
+    <input type="email" id="email" placeholder="Email" required />
+    <input type="tel" id="phone" placeholder="Phone Number" required />
+    <input type="password" id="password" placeholder="Password" required />
+    <button type="submit">Register</button>
+  </form>
+  <div class="login-link">
+    Already have an account? <a href="login.html">Login</a>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+  import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBDXn58AfcKIBFsinI11WgOAPJOMVCC1wI",
+    authDomain: "chantel-fdc1e.firebaseapp.com",
+    projectId: "chantel-fdc1e",
+    storageBucket: "chantel-fdc1e.appspot.com",
+    messagingSenderId: "1062906679466",
+    appId: "1:1062906679466:web:19311b66baa69bb09440d3"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  // Capture referrer from URL and store in localStorage
+  const urlParams = new URLSearchParams(window.location.search);
+  const referrerId = urlParams.get('ref');
+  if (referrerId) {
+    localStorage.setItem("referrer", referrerId);
+  }
+
+  // Handle form submission
+  const form = document.getElementById("registerForm");
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    const fullName = document.getElementById("fullName").value;
+    const phone = document.getElementById("phone").value;
+    const referredBy = localStorage.getItem("referrer");
+
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      await setDoc(doc(db, "users", user.uid), {
+        email: user.email,
+        fullName,
+        phone,
+        wallet: 0,
+        referralReward: 0,
+        hasActiveInvestment: false,
+        referredBy: referredBy || null
+      });
+
+      window.location.href = "dashboard.html";
+    } catch (error) {
+      alert(error.message);
+    }
+  });
+
+  // Hamburger menu toggle
+  document.getElementById("menuToggle").addEventListener("click", () => {
+    document.getElementById("mobileMenu").classList.toggle("show");
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Chantel Investments</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .hamburger-menu {
+      font-size: 28px;
+      cursor: pointer;
+      padding: 10px;
+      color: white;
+      background: none;
+      border: none;
+      display: none;
+    }
+
+    .mobile-nav {
+      display: none;
+      flex-direction: column;
+      background-color: #003366;
+      padding: 15px;
+    }
+
+    .mobile-nav a {
+      color: white;
+      padding: 10px 0;
+      text-decoration: none;
+      font-weight: bold;
+      
+    }
+
+    .mobile-nav.show {
+      display: flex;
+    }
+.hamburger-menu {
+  display: block; /* Always visible */
+}
+
+    .btn {
+      display: inline-block;
+      margin-top: 15px;
+      background: #008000;
+      color: white;
+      padding: 12px 20px;
+      text-decoration: none;
+      border-radius: 6px;
+      
+    }
+
+    .btn:hover {
+      background: #005fa3;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+  <div class="logo" style="text-align: center; font-weight: bold;">C & H</div>
+ <div class="nav-container">
+    <button class="hamburger-menu" onclick="toggleMenu()">☰</button>
+    <nav class="desktop-nav">
+      <!-- other links -->
+    </nav>
+  </div>
+    <!-- Mobile Menu -->
+    
+    <nav id="mobileMenu" class="mobile-nav">
+      <a href="index.html">Home</a>
+      <a href="plans.html">Investment Plans</a>
+      <a href="account.html">My Account</a>
+      <a href="login.html">Login</a>
+      <a href="register.html">Register</a>
+    </nav>
+  </header>
+
+  <!-- Main Content -->
+  <main>
+    <section class="hero">
+      <h1 style="text-align: center;">Welcome to Chantel Investments</h1>
+      <p style="text-align: center; font-weight: bold; font-size: 30px
+      ">Invest in quality home items with guaranteed daily returns.</p>
+ <a href="plans.html" class="btn" style="font-weight: bold; text-align: center;display: block; text-decoration: none; font-size= 20px">View Investment Plans</a>
+
+    </section>
+
+    <section class="about">
+      <h2>Why Invest With Us?</h2>
+      <ul>
+        <li style="font-weight: bold;">Secure investments in home items like Chairs, Tables, Cups, and more.</li>
+        <li style="font-weight: bold;">Daily guaranteed returns based on your investment plan.</li>
+        <li style="font-weight: bold;">Minimum withdrawal of ₦5,000 at the end of each month.</li>
+        <li style="font-weight: bold;">Maximum withdrawal of ₦5,000,000 at the end of each month</li>
+        <li style="font-weight: bold;">Trusted company with transparent processes.</li>
+        <li style= "font-weight: bold; font-weight: 10px;">It is highly advisable to Contact manager on Telegram via 07046630967 or Whatsapp via 09077735074; before registering</li>
+      </ul>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <p style="text-align: center; font-weight: bold; font-size: 20px;" >Contact admin: <a href="mailto:williamschinedu169@gmail.com">williamschinedu169@gmail.com</a></p>
+    <p style="text-align: center; font-weight: bold; font-size: 20px">Phone: 09077735074</p>
+  </footer>
+
+  <!-- Toggle Script -->
+  <script>
+    function toggleMenu() {
+      document.getElementById('mobileMenu').classList.toggle('show');
+    }
+  </script>
+
+</body>
+</html>

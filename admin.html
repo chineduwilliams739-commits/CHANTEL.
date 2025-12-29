@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Admin Dashboard - Happy Home Investments</title>
+
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #f4f7fc;
+    margin: 0; padding: 20px;
+  }
+  #loadingScreen {
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    color: #007bff;
+  }
+  .section {
+    display: none;
+    background: white;
+    margin-top: 20px;
+    border-radius: 8px;
+    padding: 0;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+  .section h2 {
+    background: #007bff;
+    color: white;
+    padding: 12px;
+    margin: 0;
+    border-radius: 8px 8px 0 0;
+    font-size: 18px;
+  }
+  .search-box {
+    padding: 10px 15px;
+  }
+  input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    font-size: 15px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    margin-bottom: 5px;
+  }
+  .table-wrapper {
+    padding: 10px 15px 15px;
+    overflow-x: auto;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 650px;
+  }
+  th, td {
+    padding: 10px;
+    border-bottom: 1px solid #e0e0e0;
+    text-align: left;
+    white-space: nowrap;
+  }
+  th {
+    background: #eaf0fb;
+  }
+  tr:hover {
+    background: #f1f5ff;
+  }
+  button {
+    padding: 7px 12px;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  .fund-btn { background: #28a745; }
+  .approve-btn { background: #007bff; }
+  .reject-btn { background: #dc3545; }
+  .status-msg {
+    text-align: center;
+    font-size: 16px;
+    margin-top: 15px;
+    font-weight: bold;
+  }
+</style>
+</head>
+<body>
+  <div id="loadingScreen">Checking admin access...</div>
+
+  <div class="section" id="usersSection">
+    <h2>Registered Users</h2>
+    <div class="search-box">
+      <input type="text" id="userSearch" placeholder="Search by user email...">
+    </div>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Email</th>
+            <th>Full Name</th>
+            <th>Phone</th>
+            <th>Wallet (₦)</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="usersTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section" id="withdrawalsSection">
+    <h2>Withdrawal Requests</h2>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Email</th>
+            <th>Amount (₦)</th>
+            <th>Account Name</th>
+            <th>Account Number</th>
+            <th>Bank</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="withdrawalsTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="statusMessage" class="status-msg"></div>
+
+  <!-- Firebase SDKs (Compat) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBDXn58AfcKIBFsinI11WgOAPJOMVCC1wI",
+      authDomain: "chantel-fdc1e.firebaseapp.com",
+      projectId: "chantel-fdc1e",
+      storageBucket: "chantel-fdc1e.appspot.com",
+      messagingSenderId: "1062906679466",
+      appId: "1:1062906679466:web:19311b66baa69bb09440d3",
+      measurementId: "G-B472NL04QC"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    const loadingScreen = document.getElementById("loadingScreen");
+    const usersSection = document.getElementById("usersSection");
+    const withdrawalsSection = document.getElementById("withdrawalsSection");
+    const statusMessage = document.getElementById("statusMessage");
+
+    const usersTable = document.getElementById("usersTable");
+    const withdrawalsTable = document.getElementById("withdrawalsTable");
+    const searchInput = document.getElementById("userSearch");
+
+    let usersData = [];
+
+    // ---------- ADMIN CHECK FIRST ----------
+    auth.onAuthStateChanged(async (user) => {
+      if (!user) {
+        window.location.href = "login.html";
+        return;
+        console.log("Current user:", user);
+      }
+
+      const docSnap = await db.collection("users").doc(user.uid).get();
+      if (!docSnap.exists) {
+        alert("Profile not found. Access denied.");
+        auth.signOut();
+        window.location.href = "login.html";
+        return;
+      }
+
+      const userData = docSnap.data();
+      if (userData.isAdmin !== true) {
+        alert("Access denied. Admins only.");
+        auth.signOut();
+        window.location.href = "login.html";
+        return;
+      }
+
+      // If admin ✔
+      loadingScreen.style.display = "none";
+      usersSection.style.display = "block";
+      withdrawalsSection.style.display = "block";
+
+      loadUsers();
+      loadWithdrawals();
+    });
+
+    // ---------- LOAD REGISTERED USERS ----------
+    async function loadUsers() {
+      usersTable.innerHTML = `<tr><td colspan="5">Loading users...</td></tr>`;
+      const snapshot = await db.collection("users").get();
+      usersData = snapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
+      displayUsers(usersData);
+    }
+
+    function displayUsers(list) {
+      if (!list.length) {
+        usersTable.innerHTML = `<tr><td colspan="5">No users found.</td></tr>`;
+        return;
+      }
+      usersTable.innerHTML = "";
+      list.forEach(user => {
+        usersTable.innerHTML += `
+          <tr>
+            <td>user.email</td>
+            <td>{user.fullName || "-"}</td>
+            <td>user.phone || "-"</td>
+            <td>₦{(user.wallet || 0).toLocaleString()}</td>
+            <td><button class="fund-btn" onclick="fundUser('user.id')">Fund</button></td>
+          </tr>`;
+      );
+    
+
+    window.fundUser = async function(uid) 
+      let amount = prompt("Enter amount to fund (₦):");
+      if (amount === null) return;
+      amount = amount.replace(/,/g, "").trim();
+      if (isNaN(amount) || Number(amount) <= 0) 
+        alert("Enter a valid amount.");
+        return;
+      
+      const userRef = db.collection("users").doc(uid);
+      const userObj = usersData.find(u => u.id === uid);
+      const newBal = (userObj.wallet || 0) + Number(amount);
+      await userRef.update( wallet: newBal );
+
+      statusMessage.style.color = "green";
+      statusMessage.textContent = `Funded ₦{Number(amount).toLocaleString()}`;
+      loadUsers();
+    };
+
+    // ---------- LOAD WITHDRAWALS ----------
+    async function loadWithdrawals() {
+      withdrawalsTable.innerHTML = `<tr><td colspan="6">Loading withdrawals...</td></tr>`;
+      const snapshot = await db.collection("withdrawals").get();
+      if (snapshot.empty) {
+        withdrawalsTable.innerHTML = `<tr><td colspan="6">No withdrawal requests.</td></tr>`;
+        return;
+      }
+      withdrawalsTable.innerHTML = "";
+      snapshot.forEach(docSnap => {
+        const w = docSnap.data();
+        withdrawalsTable.innerHTML += `
+          <tr>
+            <td>w.email</td>
+            <td>₦{(w.amount || 0).toLocaleString()}</td>
+            <td>w.accountName</td>
+            <td>{w.accountNumber}</td>
+            <td>w.bankName</td>
+            <td>
+              <button class="approve-btn" onclick="approveWithdrawal('{docSnap.id}')">Approve</button>
+              <button class="reject-btn" onclick="rejectWithdrawal('${docSnap.id}')">Reject</button>
+            </td>
+          </tr>`;
+      });
+    }
+
+    window.approveWithdrawal = async function(id) {
+      await db.collection("withdrawals").doc(id).delete();
+      statusMessage.style.color = "green";
+      statusMessage.textContent = "Withdrawal approved!";
+      loadWithdrawals();
+    };
+
+    window.rejectWithdrawal = async function(id) {
+      await db.collection("withdrawals").doc(id).delete();
+      statusMessage.style.color = "red";
+      statusMessage.textContent = "Withdrawal rejected.";
+      loadWithdrawals();
+    };
+    // ---------- SEARCH USERS ----------
+    searchInput.addEventListener("input", () => {
+      const val = searchInput.value.toLowerCase();
+      const filtered = usersData.filter(u => u.email.toLowerCase().includes(val));
+      displayUsers(filtered);
+    });
+  </script>
+</body>
+</html>

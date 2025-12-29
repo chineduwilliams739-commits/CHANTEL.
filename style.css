@@ -1,0 +1,128 @@
+css
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  background-color: #f4f7f9;
+  color: #333;
+}
+
+/* Header */
+header {
+  background-color: #003366;
+  padding: 20px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  color: white;
+}
+
+/* Logo */
+.logo {
+  font-weight: bold;
+  font-size: 24px;
+  letter-spacing: 5px;
+  color: white;
+}
+
+/* Hamburger Button */
+.hamburger-menu {
+  font-size: 26px;
+  color: white;
+  background: #003366;
+  border: none;
+  cursor: pointer;
+  display: none;
+  padding: 10px;
+}
+
+/* Desktop Nav */
+.desktop-nav {
+  display: flex;
+  gap: 25px;
+}
+
+.desktop-nav a {
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.desktop-nav a:hover,
+.desktop-nav a.active {
+  color: #00cc66;
+  text-decoration: underline;
+}
+
+/* Mobile Nav */
+.mobile-nav {
+  display: none;
+  flex-direction: column;
+  background-color: #003366;
+  padding: 15px 20px;
+  width: 100%;
+}
+
+.mobile-nav a {
+  color: white;
+  padding: 10px 0;
+  text-decoration: none;
+  font-weight: bold;
+  border-bottom: 1px solid #ffffff33;
+}
+
+/* Show mobile nav when toggled */
+.mobile-nav.show {
+  display: flex;
+}
+
+/* Responsive Rules */
+@media (max-width: 768px) {
+  .hamburger-menu {
+    display: block;
+  }
+
+  .desktop-nav {
+    display: none;
+  }
+}
+
+/* UI Styles */
+h1, h2 {
+  color: #003366;
+  margin-bottom: 20px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 30px;
+}
+
+table, th, td {
+  border: 1px solid #ddd;
+}
+
+th, td {
+  padding: 15px;
+  text-align: center;
+}
+
+.about ul {
+  margin-top: 20px;
+  list-style: inside disc;
+  font-size: 1.1em;
+  color: #444;
+  line-height: 1.6;
+}
+
+.btn:hover {
+  background-color: #009944;
+}

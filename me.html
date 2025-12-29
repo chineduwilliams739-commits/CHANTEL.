@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>My Profile - Happy Home</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f4f7fa;
+      color: #333;
+    }
+    header {
+      background-color: #0077cc;
+      padding: 20px;
+      color: white;
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: 600;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .profile-container {
+      max-width: 500px;
+      margin: 40px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    .avatar {
+      width: 80px;
+      height: 80px;
+      background-color: #0077cc;
+      color: white;
+      border-radius: 50%;
+      font-size: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+    }
+    .info-group {
+      margin: 15px 0;
+    }
+    .info-group label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+    .info-group input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    .action-btn {
+      background: #0077cc;
+      color: white;
+      padding: 12px;
+      width: 100%;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 15px;
+      transition: background 0.3s ease;
+    }
+    .action-btn:hover {
+      background: #005fa3;
+    }
+    .icon-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 25px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .icon-btn {
+      flex: 1 1 45%;
+      background: #f1f4f7;
+      border: none;
+      padding: 15px;
+      font-size: 14px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .icon-btn:hover {
+      background: #d8eafc;
+    }
+    .icon-btn img {
+      width: 24px;
+      height: 24px;
+    }
+    #statusMessage {
+      text-align: center;
+      margin-top: 15px;
+      font-weight: 600;
+    }
+  .amount-box {
+    background: #e6f3ff;
+    color: #0077cc;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 18px;
+    text-align: center;
+    margin-top: 5px;
+  }
+  </style>
+</head>
+<body>
+  <header>My Account</header>
+
+  <div class="profile-container">
+    <div class="avatar" id="userInitials">--</div>
+  <div class="info-group">
+  <label><strong>Withdrawable Amount:</strong></label>
+  <div class="amount-box" id="withdrawable">₦0</div>
+</div>
+
+  <div class="info-group">
+  <label><strong>Referral Reward:</strong></label>
+  <div class="amount-box" id="referral">₦0 (Locked)</div>
+</div>
+
+  <div class="info-group">
+  <label><strong>Total Balance:</strong></label>
+  <div class="amount-box" id="totalBalance">₦0</div>
+</div>
+
+    <div class="info-group">
+      <label>Full Name</label>
+      <input type="text" id="fullName" placeholder="Enter full name" />
+    </div>
+
+    <div class="info-group">
+      <label>Email</label>
+      <input type="email" id="email" readonly />
+    </div>
+
+    <div class="info-group">
+      <label>Phone Number</label>
+      <input type="tel" id="phone" placeholder="Enter phone number" />
+    </div>
+
+    <button class="action-btn" onclick="updateProfile()">Save Changes</button>
+
+    <div class="icon-buttons">
+      <button class="icon-btn" onclick="window.location.href='deposit.html'">
+        <img src="deposit.jpg" alt="Deposit"> Deposit
+      </button>
+      <button class="icon-btn" onclick="window.location.href='withdraw.html'">
+        <img src="withdraw.jpg" alt="Withdraw"> Withdraw
+      </button>
+      <button class="icon-btn" onclick="contactAdmin()">
+        <img src="whatsapp.jpg" alt="WhatsApp"> Contact Admin
+      </button>
+      <button class="icon-btn" onclick="logout()">
+        <img src="logout.jpg" alt="Logout"> Logout
+      </button>
+    </div>
+
+    <p id="statusMessage"></p>
+  </div>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyBDXn58AfcKIBFsinI11WgOAPJOMVCC1wI",
+    authDomain: "chantel-fdc1e.firebaseapp.com",
+    projectId: "chantel-fdc1e",
+    storageBucket: "chantel-fdc1e.appspot.com",
+    messagingSenderId: "1062906679466",
+    appId: "1:1062906679466:web:19311b66baa69bb09440d3"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  const fullNameInput = document.getElementById("fullName");
+  const emailInput = document.getElementById("email");
+const phoneInput = document.getElementById("phone");
+  const statusMessage = document.getElementById("statusMessage");
+  const userInitials = document.getElementById("userInitials");
+
+  const walletInput = document.getElementById("walletBalance");
+  const referralInput = document.getElementById("referralReward");
+  const totalBalanceInput = document.getElementById("totalBalance");
+
+  auth.onAuthStateChanged(user => {
+    if (!user) return window.location.href = "login.html";
+
+    emailInput.value = user.email;
+    const initials = user.email[0].toUpperCase() + (user.email.split('@')[0][1]?.toUpperCase() || '');
+    userInitials.textContent = initials;
+
+    // Listen to user document in real-time
+    db.collection("users").doc(user.uid).onSnapshot(doc => {
+      if (doc.exists) {
+        const data = doc.data();
+        fullNameInput.value = data.fullName || "";
+        phoneInput.value = data.phone || "";
+
+        const wallet = data.wallet || 0;
+        const referral = data.referralReward || 0;
+
+        // Now check for active investment
+        db.collection("investments")
+          .where("userId", "==", user.uid)
+          .where("status", "==", "active")
+          .get()
+          .then(snapshot => {
+            const hasActive = !snapshot.empty;
+            const referralDisplay = hasActive ? referral : 0;
+            referralInput.value = "₦" + referralDisplay.toLocaleString() + (hasActive ? "" : " (Locked)");
+            walletInput.value = "₦" + wallet.toLocaleString();
+            totalBalanceInput.value = "₦" + (wallet + referralDisplay).toLocaleString();
+          });
+      }
+    });
+  });
+
+  function updateProfile() {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const fullName = fullNameInput.value.trim();
+    const phone = phoneInput.value.trim();
+
+    db.collection("users").doc(user.uid).set({ fullName, phone }, { merge: true })
+      .then(() => {
+        statusMessage.style.color = "green";
+        statusMessage.textContent = "Profile updated successfully!";
+      })
+      .catch(err => {
+        statusMessage.style.color = "red";
+        statusMessage.textContent = "Error: " + err.message;
+      });
+  }
+
+  function logout() {
+    auth.signOut().then(() => {
+      window.location.href = "login.html";
+    });
+  }
+
+  function contactAdmin() {
+    window.open("https://wa.me/2349077735074", "_blank");
+  }
+</script>
+</body>
+</html>
