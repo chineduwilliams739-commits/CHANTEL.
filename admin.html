@@ -1,102 +1,200 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Admin Panel</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f1f1f1;
+      margin: 0;
       padding: 20px;
-      background: #f4f4f4;
     }
+
     h1 {
       text-align: center;
+      color: #222;
     }
+
     .section {
-      background: white;
+      background: #fff;
+      margin: 20px auto;
       padding: 20px;
-      margin-bottom: 20px;
       border-radius: 10px;
+      max-width: 100%;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      margin-top: 0;
+      color: #333;
+    }
+
+    .table-container {
       overflow-x: auto;
     }
+
     table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 600px;
+      margin-top: 10px;
     }
+
     th, td {
-      border: 1px solid #ccc;
-      padding: 8px;
+      padding: 10px;
       text-align: left;
+      border: 1px solid #ddd;
     }
+
     th {
       background: #007bff;
-      color: white;
+      color: #fff;
+      white-space: nowrap;
     }
+
     input[type="text"] {
-      width: 100%;
       padding: 8px;
+      width: 100%;
       margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
     }
-    .loading {
+
+    .hidden { display: none; }
+
+    .center-text {
       text-align: center;
-      color: blue;
+      color: #007bff;
       font-weight: bold;
     }
   </style>
 </head>
 <body>
-
   <h1>Admin Dashboard</h1>
-  <div class="loading" id="loading">Checking admin access...</div>
-  <div id="content" style="display:none;">
+  <p class="center-text" id="accessMsg">Checking admin access...</p>
 
+  <div id="adminContent" class="hidden">
     <div class="section">
       <h2>Registered Users</h2>
-      <input type="text" id="searchInput" placeholder="Search by email..." />
-      <table>
-        <thead>
-          <tr>
-            <th>Email</th>
-            <th>Full Name</th>
-            <th>Phone</th>
-            <th>Wallet</th>
-            <th>Referral Reward</th>
-          </tr>
-        </thead>
-        <tbody id="usersTable"></tbody>
-      </table>
+      <input type="text" id="searchInput" placeholder="Search by email..."/>
+      <div class="table-container">
+        <table id="usersTable">
+          <thead>
+            <tr>
+              <th>Email</th>
+              <th>Full Name</th>
+              <th>Phone</th>
+              <th>Wallet</th>
+              <th>Referral Reward</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
     </div>
 
     <div class="section">
       <h2>Withdrawal Requests</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Email</th>
-            <th>Amount</th>
-            <th>Status</th>
-            <th>Date & Time</th>
-          </tr>
-        </thead>
-        <tbody id="withdrawalsTable"></tbody>
-      </table>
+      <div class="table-container">
+        <table id="withdrawalsTable">
+          <thead>
+            <tr>
+              <th>Email</th>
+              <th>Amount</th>
+              <th>Status</th>
+              <th>Date & Time</th>
+            </tr>
+            </thead>
+          <tbody></tbody>
+        </table>
+      </div>
     </div>
-
   </div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+  <!-- Firebase Scripts -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
+  <script>
     const firebaseConfig = {
       apiKey: "AIzaSyBDXn58AfcKIBFsinI11WgOAPJOMVCC1wI",
       authDomain: "chantel-fdc1e.firebaseapp.com",
       projectId: "chantel-fdc1e",
-      storageBucket: "chantel-fdc1e.appspot.com",
+      storageBucket: "chantel-fdc1e.firebasestorage.app",
       messagingSenderId: "1062906679466",
-      appId: "1:1062906679466:web:19311b66baa69bb09440d3"
+      appId: "1:1062906679466:web:19311b66baa69bb09440d3",
+      measurementId: "G-B472NL04QC"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    const adminEmail = "chinedtuwilliams739@gmail.com";
+
+    auth.onAuthStateChanged(user => {
+      if (!user) {
+        window.location.href = "login.html";
+      } else if (user.email !== adminEmail) {
+        document.getElementById("accessMsg").innerText = "Access denied.";
+      } else {
+        document.getElementById("accessMsg").style.display = "none";
+        document.getElementById("adminContent").classList.remove("hidden");
+        loadUsers();
+        loadWithdrawals();
+      }
+    });
+
+    function loadUsers() {
+      db.collection("users").get().then(snapshot => {
+        const tbody = document.querySelector("#usersTable tbody");
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>data.email || ""</td>
+            <td>{data.fullName || ""}</td>
+            <td>data.phone || ""</td>
+            <td>{data.wallet || ""}</td>
+            <td>data.referralReward || "₦0"</td>
+          `;
+          tbody.appendChild(row);
+        );
+      );
+    
+
+    function loadWithdrawals() 
+      db.collection("withdrawals").orderBy("timestamp", "desc").get().then(snapshot => 
+        const tbody = document.querySelector("#withdrawalsTable tbody");
+        snapshot.forEach(doc => 
+          const data = doc.data();
+          const date = data.timestamp?.toDate?.().toLocaleString() || "";
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>{data.email || ""}</td>
+            <td>₦data.amount || 0</td>
+            <td>{data.status || "pending"}</td>
+            <td>${date}</td>
+            `;
+          tbody.appendChild(row);
+        });
+      });
+    }
+
+    // Search functionality
+    document.getElementById("searchInput").addEventListener("input", function () {
+      const filter = this.value.toLowerCase();
+      const rows = document.querySelectorAll("#usersTable tbody tr");
+      rows.forEach(row => {
+        const email = row.cells[0].textContent.toLowerCase();
+        row.style.display = email.includes(filter) ? "" : "none";
+      });
+    });
+  </script>
+</body>
+</html>      appId: "1:1062906679466:web:19311b66baa69bb09440d3"
     };
 
     const app = initializeApp(firebaseConfig);
